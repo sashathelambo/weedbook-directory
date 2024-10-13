@@ -44,7 +44,7 @@
             margin-bottom: 1.5rem;
             padding: 1rem;
             border: 2px solid #2c5282;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
             cursor: pointer;
         }
         
@@ -118,6 +118,22 @@
         .dark-mode .dropdown-content {
             background-color: #2d3748;
             color: #ebf0f2;
+        }
+        /* Smooth scrolling */
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Transition for vendor elements */
+        
+        .vendor.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .vendor.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -212,10 +228,9 @@
             fetch('VendorData.csv')
                 .then(response => response.text())
                 .then(data => {
-                    // Parse CSV data
                     const rows = data.split('\n');
                     rows.forEach((row, index) => {
-                        if (index === 0) return; // Skip header row
+                        if (index === 0) return;
                         const columns = row.split(',');
                         if (columns.length > 1) {
                             const vendor = {
@@ -228,9 +243,7 @@
                             vendorData.push(vendor);
                         }
                     });
-                    // Sort vendors alphabetically by name
                     vendorData.sort((a, b) => a.name.localeCompare(b.name));
-                    // Now you can use vendorData as needed
                     displayVendors(vendorData);
                 })
                 .catch(error => console.error('Error fetching vendor data:', error));
@@ -239,7 +252,7 @@
                 const fragment = document.createDocumentFragment();
                 vendors.forEach(vendor => {
                     const vendorElement = document.createElement('div');
-                    vendorElement.classList.add('vendor');
+                    vendorElement.classList.add('vendor', 'hidden');
                     vendorElement.innerHTML = `
                         <div class="flex items-center justify-center">
                             <a href="${vendor.link}" target="_blank" class="text-black-500 hover:underline">${vendor.name}</a>
@@ -252,6 +265,17 @@
                 });
                 vendorsContainer.innerHTML = '';
                 vendorsContainer.appendChild(fragment);
+                revealVendors();
+            }
+
+            function revealVendors() {
+                const vendorElements = document.querySelectorAll('.vendor');
+                vendorElements.forEach((vendor, index) => {
+                    setTimeout(() => {
+                        vendor.classList.remove('hidden');
+                        vendor.classList.add('visible');
+                    }, index * 100); // Stagger the reveal for each vendor
+                });
             }
 
             // Debounce function to limit the rate of function calls
@@ -263,7 +287,6 @@
                 };
             }
 
-            // Filter and sort vendors based on user input
             function filterAndSortVendors() {
                 const searchTerm = vendorSearchTop.value.toLowerCase();
                 const selectedCategory = vendorCategoryTop.value;
@@ -286,7 +309,6 @@
                 displayVendors(filteredVendors);
             }
 
-            // Event listeners
             vendorSearchTop.addEventListener('input', debounce(filterAndSortVendors, 300));
             vendorCategoryTop.addEventListener('change', filterAndSortVendors);
             vendorSortTop.addEventListener('change', filterAndSortVendors);
@@ -298,7 +320,6 @@
                 displayVendors(vendorData);
             });
 
-            // Dark mode toggle
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             darkModeToggle.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
