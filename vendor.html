@@ -252,7 +252,7 @@
                 const fragment = document.createDocumentFragment();
                 vendors.forEach(vendor => {
                     const vendorElement = document.createElement('div');
-                    vendorElement.classList.add('vendor', 'hidden');
+                    vendorElement.classList.add('vendor', 'visible'); // Directly add 'visible' class
                     vendorElement.innerHTML = `
                         <div class="flex items-center justify-center">
                             <a href="${vendor.link}" target="_blank" class="text-black-500 hover:underline">${vendor.name}</a>
@@ -265,17 +265,6 @@
                 });
                 vendorsContainer.innerHTML = '';
                 vendorsContainer.appendChild(fragment);
-                revealVendors();
-            }
-
-            function revealVendors() {
-                const vendorElements = document.querySelectorAll('.vendor');
-                vendorElements.forEach((vendor, index) => {
-                    setTimeout(() => {
-                        vendor.classList.remove('hidden');
-                        vendor.classList.add('visible');
-                    }, index * 100); // Stagger the reveal for each vendor
-                });
             }
 
             // Debounce function to limit the rate of function calls
