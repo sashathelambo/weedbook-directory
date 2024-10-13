@@ -442,6 +442,12 @@
                 <!-- Product items will be dynamically loaded here -->
             </div>
         </section>
+
+        <!-- Under Construction Section -->
+        <section class="under-construction text-center my-8">
+            <h2 class="text-xl font-bold mb-4">This Section is Under Construction</h2>
+            <img src="public/images/underconstruction.gif" alt="Under Construction" class="mx-auto">
+        </section>
     </main>
 
     <footer>
@@ -564,7 +570,9 @@
                 const filteredProducts = vendorData.filter(vendor => {
                     const matchesCategory = selectedCategory === 'all' || vendor.category.toLowerCase() === selectedCategory;
                     const matchesVendor = selectedVendor === 'all' || vendor.name === selectedVendor;
-                    const matchesSearch = vendor.name.toLowerCase().includes(searchQuery);
+                    const matchesSearch = vendor.name.toLowerCase().includes(searchQuery) ||
+                        vendor.category.toLowerCase().includes(searchQuery) ||
+                        vendor.coupons.some(coupon => coupon.toLowerCase().includes(searchQuery));
                     return matchesCategory && matchesVendor && matchesSearch;
                 });
 
