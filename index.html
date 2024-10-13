@@ -407,7 +407,9 @@
 
         <section class="product-list p-6" id="product-list">
             <h2 class="text-xl font-bold mb-6">Find a plug:</h2>
-            <input type="text" id="vendor-search" placeholder="Search for a vendor..." class="w-full mb-4 p-2 border rounded" required pattern="[A-Za-z0-9\s]+" title="Only alphanumeric characters and spaces are allowed">
+            <div class="flex justify-center mb-4">
+                <input type="text" id="vendor-search" placeholder="Search for a vendor..." class="w-full max-w-md p-2 border rounded" required pattern="[A-Za-z0-9\s]+" title="Only alphanumeric characters and spaces are allowed">
+            </div>
             <form class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                     <label for="category-select" class="block mb-2">Select Category</label>
@@ -438,7 +440,7 @@
                 <button id="warning-ok" class="mt-4 w-full">OK</button>
             </div>
 
-            <div class="products grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products">
+            <div class="products flex flex-wrap justify-center gap-6" id="products">
                 <!-- Product items will be dynamically loaded here -->
             </div>
         </section>
@@ -565,14 +567,16 @@
             function filterProducts() {
                 const selectedCategory = elements.categorySelect.value;
                 const selectedVendor = elements.vendorSelect.value;
-                const searchQuery = elements.vendorSearch.value.toLowerCase();
+                const searchQuery = elements.vendorSearch.value.toLowerCase().trim();
 
                 const filteredProducts = vendorData.filter(vendor => {
                     const matchesCategory = selectedCategory === 'all' || vendor.category.toLowerCase() === selectedCategory;
                     const matchesVendor = selectedVendor === 'all' || vendor.name === selectedVendor;
-                    const matchesSearch = vendor.name.toLowerCase().includes(searchQuery) ||
+                    const matchesSearch = searchQuery !== '' && (
+                        vendor.name.toLowerCase().includes(searchQuery) ||
                         vendor.category.toLowerCase().includes(searchQuery) ||
-                        vendor.coupons.some(coupon => coupon.toLowerCase().includes(searchQuery));
+                        vendor.coupons.some(coupon => coupon.toLowerCase().includes(searchQuery))
+                    );
                     return matchesCategory && matchesVendor && matchesSearch;
                 });
 
@@ -580,22 +584,29 @@
             }
 
             function displayFilteredVendors(vendors) {
+                const productsContainer = document.getElementById('products');
+                productsContainer.innerHTML = ''; // Clear existing products
+
+                if (vendors.length === 0) {
+                    productsContainer.innerHTML = '<p>No vendors searched.</p>'; // Updated message
+                    return;
+                }
+
                 const fragment = document.createDocumentFragment();
                 vendors.forEach(vendor => {
                     const vendorElement = document.createElement('div');
-                    vendorElement.classList.add('vendor');
+                    vendorElement.classList.add('vendor', 'p-4', 'border', 'rounded', 'shadow');
                     vendorElement.innerHTML = `
                         <div class="flex items-center justify-center">
-                            <a href="${vendor.link}" target="_blank" class="text-black-500 hover:underline">${vendor.name}</a>
+                            <a href="${vendor.link}" target="_blank" class="text-blue-500 hover:underline">${vendor.name}</a>
                         </div>
-                        <div class="coupons">
+                        <div class="coupons mt-2">
                             ${vendor.coupons.length > 0 ? 'Coupons: ' + vendor.coupons.join(', ') : 'No coupons available'}
                         </div>
                     `;
                     fragment.appendChild(vendorElement);
                 });
-                elements.vendorModal.innerHTML = '';
-                elements.vendorModal.appendChild(fragment);
+                productsContainer.appendChild(fragment);
             }
 
             function setFeaturedVendor() {
