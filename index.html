@@ -510,7 +510,7 @@
             }
 
             function initializeCarousel() {
-                const featuredVendors = vendorData.slice(0, 10); // Get first 10 vendors
+                const featuredVendors = vendorData; // Get all vendors
                 elements.carousel.innerHTML = ''; // Clear existing vendors
 
                 featuredVendors.forEach(vendor => {
