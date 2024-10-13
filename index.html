@@ -452,9 +452,6 @@
         </div>
     </div>
     <script>
-        // Ensure logger is correctly imported if using modules
-        // import logger from './logger.js'; // Uncomment if using modules
-
         document.addEventListener('DOMContentLoaded', function() {
             const elements = {
                 vendorSelect: document.getElementById('vendor-select'),
@@ -468,7 +465,11 @@
                 ageYesButton: document.getElementById('age-yes'),
                 ageNoButton: document.getElementById('age-no'),
                 dashboard: document.querySelector('main'),
-                vendorSearch: document.getElementById('vendor-search')
+                vendorSearch: document.getElementById('vendor-search'),
+                featuredVendorName: document.getElementById('featured-vendor-name'),
+                featuredVendorLink: document.getElementById('featured-vendor-link'),
+                featuredVendorCoupons: document.getElementById('featured-vendor-coupons'),
+                carousel: document.getElementById('carousel')
             };
 
             let vendorData = [];
@@ -476,10 +477,9 @@
             fetch('VendorData.csv')
                 .then(response => response.text())
                 .then(data => {
-                    // Parse CSV data
                     const rows = data.split('\n');
                     rows.forEach((row, index) => {
-                        if (index === 0) return; // Skip header row
+                        if (index === 0) return;
                         const columns = row.split(',');
                         if (columns.length > 1) {
                             const vendor = {
@@ -492,12 +492,56 @@
                             vendorData.push(vendor);
                         }
                     });
-                    // Now you can use vendorData as needed
+                    vendorData.sort((a, b) => a.name.localeCompare(b.name));
                     populateVendorDropdown();
                     populateCategoryDropdown();
+                    setFeaturedVendor();
+                    initializeCarousel();
                 })
                 .catch(error => console.error('Error fetching vendor data:', error));
 
+            function setFeaturedVendor() {
+                const randomVendor = vendorData[Math.floor(Math.random() * vendorData.length)];
+                elements.featuredVendorName.textContent = randomVendor.name;
+                elements.featuredVendorLink.href = randomVendor.link;
+                elements.featuredVendorCoupons.innerHTML = randomVendor.coupons.length > 0 ?
+                    `<h4 class="text-lg font-bold mb-2">Available Coupons:</h4>${randomVendor.coupons.join(', ')}` :
+                    '<p>No coupons available.</p>';
+            }
+
+            function initializeCarousel() {
+                const featuredVendors = vendorData.slice(0, 10); // Get first 10 vendors
+                elements.carousel.innerHTML = ''; // Clear existing vendors
+
+                featuredVendors.forEach(vendor => {
+                    const vendorElement = document.createElement('div');
+                    vendorElement.classList.add('vendor-name');
+                    vendorElement.textContent = vendor.name;
+                    elements.carousel.appendChild(vendorElement);
+                });
+
+                const firstVendorClone = elements.carousel.firstElementChild.cloneNode(true);
+                elements.carousel.appendChild(firstVendorClone);
+
+                let currentIndex = 0;
+                const totalVendors = featuredVendors.length;
+
+                function rotateCarousel() {
+                    currentIndex++;
+                    elements.carousel.style.transition = 'transform 0.5s ease-in-out';
+                    elements.carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                    if (currentIndex === totalVendors) {
+                        setTimeout(() => {
+                            elements.carousel.style.transition = 'none';
+                            elements.carousel.style.transform = 'translateX(0)';
+                            currentIndex = 0;
+                        }, 500);
+                    }
+                }
+
+                setInterval(rotateCarousel, 3000); // Rotate every 3 seconds
+            }
 
             function showAgeVerificationModal() {
                 // Check if the user has already verified their age
@@ -636,45 +680,6 @@
                 populateVendorDropdown();
             }
 
-            function initializeCarousel() {
-                const carousel = document.getElementById('carousel');
-                const featuredVendors = vendorData.slice(0, 10); // Get first 10 vendors
-
-                // Clear existing vendors
-                carousel.innerHTML = '';
-
-                // Add vendor names to the carousel
-                featuredVendors.forEach(vendor => {
-                    const vendorElement = document.createElement('div');
-                    vendorElement.classList.add('vendor-name');
-                    vendorElement.textContent = vendor.name;
-                    carousel.appendChild(vendorElement);
-                });
-
-                // Clone the first vendor and add it to the end for smooth looping
-                const firstVendorClone = carousel.firstElementChild.cloneNode(true);
-                carousel.appendChild(firstVendorClone);
-
-                let currentIndex = 0;
-                const totalVendors = featuredVendors.length;
-
-                function rotateCarousel() {
-                    currentIndex++;
-                    carousel.style.transition = 'transform 0.5s ease-in-out';
-                    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
-
-                    if (currentIndex === totalVendors) {
-                        setTimeout(() => {
-                            carousel.style.transition = 'none';
-                            carousel.style.transform = 'translateX(0)';
-                            currentIndex = 0;
-                        }, 500);
-                    }
-                }
-
-                setInterval(rotateCarousel, 3000); // Rotate every 3 seconds
-            }
-
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const featuredVendorName = document.getElementById('featured-vendor-name');
             const featuredVendorLink = document.getElementById('featured-vendor-link');
@@ -713,28 +718,6 @@
                 populateVendorDropdown(filteredProducts);
             }
 
-            function setFeaturedVendor() {
-                const vendors = vendorData;
-                const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
-                const featuredVendorSection = document.getElementById('featured-vendor');
-
-                // Add a fade-out effect
-                featuredVendorSection.style.opacity = '0';
-                featuredVendorSection.style.transform = 'translateY(10px)';
-
-                setTimeout(() => {
-                    featuredVendorName.textContent = randomVendor.name;
-                    featuredVendorLink.href = randomVendor.link;
-
-                    // Add a fade-in effect
-                    featuredVendorSection.style.opacity = '1';
-                    featuredVendorSection.style.transform = 'translateY(0)';
-                }, 300);
-            }
-
-            // Call setFeaturedVendor every 24 hours (86400000 milliseconds)
-            setInterval(setFeaturedVendor, 86400000);
-
             function sanitizeInput(input) {
                 const div = document.createElement('div');
                 div.textContent = input;
@@ -771,8 +754,7 @@
             elements.dashboard.style.display = 'none';
             elements.vendorModal.style.display = 'none';
             showAgeVerificationModal();
-            initializeCarousel();
-            setFeaturedVendor();
+            loadDarkModePreference();
 
             function filterVendorsByApplePay() {
                 const applePayVendors = vendorData.filter(vendor =>
