@@ -1,0 +1,1228 @@
+<!-- Start of Selection -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weedbook Vendor Directory</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ebf0f2;
+            color: #2d3748;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            color: white;
+            padding: 1rem 0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .vendor-carousel,
+        .product-list,
+        main {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        select,
+        button {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #cbd5e0;
+        }
+        
+        button {
+            background-color: #3182ce;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2c5282;
+        }
+        
+        #warning-message {
+            background-color: #feebc8;
+            border: 1px solid #fbd38d;
+            color: #744210;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background-color: #2c5282;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #age-modal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        .modal-content h2 {
+            color: #ebf8ff;
+        }
+        
+        .modal-content p {
+            color: #e2e8f0;
+        }
+        
+        #vendor-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #ebf0f2 25%, transparent 25%) -50px 0, linear-gradient(225deg, #ebf0f2 25%, transparent 25%) -50px 0, linear-gradient(315deg, #ebf0f2 25%, transparent 25%), linear-gradient(45deg, #ebf0f2 25%, transparent 25%);
+            background-size: 100px 100px;
+        }
+        
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            height: 3rem;
+        }
+        
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .vendor-name {
+            flex: 0 0 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c5282;
+        }
+        
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        .dark-mode header {
+            background: linear-gradient(135deg, #1e3a8a, #1a202c);
+        }
+        
+        .dark-mode .vendor-carousel,
+        .dark-mode .product-list,
+        .dark-mode main {
+            background-color: #1e293b;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark-mode button {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+        
+        .dark-mode button:hover {
+            background-color: #2563eb;
+        }
+        
+        #dark-mode-toggle {
+            background-color: #e2e8f0;
+            color: #1a202c;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        #dark-mode-toggle:hover {
+            background-color: #cbd5e0;
+        }
+        
+        .dark-mode #dark-mode-toggle {
+            background-color: #374151;
+            color: #e0e0e0;
+        }
+        
+        .dark-mode #dark-mode-toggle:hover {
+            background-color: #4a5568;
+        }
+        
+        #featured-vendor {
+            background-color: #ebf8ff;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease-in-out;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .dark-mode #featured-vendor {
+            background-color: #2c5282;
+        }
+        
+        #featured-vendor h2 {
+            color: #2c5282;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        .dark-mode #featured-vendor h2 {
+            color: #ebf8ff;
+        }
+        
+        #featured-vendor-name {
+            color: #4a5568;
+            transition: color 0.3s ease-in-out;
+        }
+        
+        .dark-mode #featured-vendor-name {
+            color: #e2e8f0;
+        }
+        
+        #featured-vendor-link {
+            transition: all 0.3s ease-in-out;
+            padding: 0.75rem 2rem;
+        }
+        
+        #featured-vendor-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        @media (max-width: 640px) {
+            #featured-vendor {
+                padding: 1rem;
+            }
+            #featured-vendor h2 {
+                font-size: 1.5rem;
+            }
+            #featured-vendor-name {
+                font-size: 1.25rem;
+            }
+            #featured-vendor-link {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+        
+        #age-modal .modal-content,
+        #vendor-modal .modal-content {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        
+        #age-modal .modal-content:hover,
+        #vendor-modal .modal-content:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        #age-modal .modal-content button,
+        #vendor-modal .modal-content button {
+            transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        
+        #age-modal .modal-content button:hover,
+        #vendor-modal .modal-content button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        /* Additional styles for the forum */
+        
+        .post {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+        }
+        
+        .comment {
+            background-color: #f7fafc;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+        }
+        /* Add edge casings */
+        
+        .edge-casing {
+            border: 2px solid #2c5282;
+            /* Change color and width as needed */
+            border-radius: 0.5rem;
+            /* Optional: to match existing border-radius */
+        }
+        /* Example: Apply edge casing to specific sections */
+        
+        .vendor-carousel,
+        .product-list,
+        #featured-vendor {
+            border: 2px solid #2c5282;
+            /* Add edge casing */
+        }
+        /* Optional: Add edge casing to modals */
+        
+        #age-modal .modal-content,
+        #vendor-modal .modal-content {
+            border: 2px solid #2c5282;
+            /* Add edge casing */
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <header>
+        <div class="container mx-auto flex items-center justify-between">
+            <h1 class="text-2xl font-bold">Weedbook Vendor Directory</h1>
+            <nav>
+                <div class="flex space-x-4">
+                    <div class="flex justify-center items-center space-x-4">
+                        <a href="#" class="hover:text-gray-300">Home</a>
+                        <a href="vendor.html" class="hover:text-gray-300">Vendors</a>
+                        <button id="dark-mode-toggle" class="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded">🌓</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto flex-grow py-8">
+        <div class="h-16"></div>
+
+        <div id="featured-vendor" class="mb-8 p-6 text-center max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4">Featured Vendor of the Day</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <p id="featured-vendor-name" class="text-xl font-semibold mb-2"></p>
+                <a id="featured-vendor-link" href="#" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Visit Website
+            </a>
+                <div id="featured-vendor-coupons" class="mt-4"></div>
+            </div>
+        </div>
+
+        <section class="vendor-carousel mb-8 p-6" id="vendor-carousel">
+            <h2 class="text-xl font-bold mb-4">Featured Vendors</h2>
+            <div class="carousel-container relative h-12 overflow-hidden">
+                <div class="carousel flex transition-transform duration-500 ease-in-out" id="carousel">
+                    <!-- Vendor names will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+
+        <section class="product-list p-6" id="product-list">
+            <h2 class="text-xl font-bold mb-6">Find a plug:</h2>
+            <input type="text" id="vendor-search" placeholder="Search for a vendor..." class="w-full mb-4 p-2 border rounded" required pattern="[A-Za-z0-9\s]+" title="Only alphanumeric characters and spaces are allowed">
+            <form class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="category-select" class="block mb-2">Select Category</label>
+                    <select id="category-select" class="w-full">
+                        <option value="all">All Categories</option>
+                        <option value="apple-pay">Apple Pay</option> <!-- Added option for Apple Pay -->
+                    </select>
+                </div>
+                <div>
+                    <label for="vendor-select" class="block mb-2">Select Vendor</label>
+                    <select id="vendor-select" class="w-full">
+                        <option value="all">All Vendors</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sort" class="block mb-2">Sort By</label>
+                    <select id="sort" class="w-full">
+                        <option value="price">Price</option>
+                        <option value="rating">Rating</option>
+                        <option value="category">Category</option>
+                    </select>
+                </div>
+            </form>
+
+            <div id="warning-message" class="hidden">
+                <p><strong>Warning:</strong> Many vape and extract products on hemp vendor websites may have mislabeling or misleading descriptions. Always read product details and COAs carefully before purchasing. If unsure, contact the vendor directly
+                    or seek guidance in the community. Stay informed to make safe choices.</p>
+                <button id="warning-ok" class="mt-4 w-full">OK</button>
+            </div>
+
+            <div class="products grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products">
+                <!-- Product items will be dynamically loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Weedbook Vendor Directory</p>
+    </footer>
+
+    <!-- Modals -->
+    <div id="vendor-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center hidden">
+        <div class="modal-content p-6 rounded-lg max-w-md w-full">
+            <span class="close" id="close-vendor-modal">&times;</span>
+            <h3 class="text-xl font-bold mb-4">Vendor Link</h3>
+            <a id="modal-vendor-link" href="#" class="text-blue-500 hover:underline">Visit Website</a>
+        </div>
+    </div>
+    <div id="age-modal" class="fixed inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 flex items-center justify-center z-50">
+        <div class="modal-content p-6 rounded-lg max-w-md w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 shadow-lg transform transition-all duration-300 scale-100 hover:scale-105">
+            <h2 class="text-2xl font-bold mb-4 text-white">Age Verification</h2>
+            <p class="mb-4 text-white">You must be at least 21 years old to enter this site. Are you of legal age?</p>
+            <div class="flex justify-end space-x-4">
+                <button id="age-no" class="bg-gradient-to-r from-red-400 to-red-600 text-white font-bold py-2 px-4 rounded transform transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-red-800" onclick="handleAgeVerification(false)">No</button>
+                <button id="age-yes" class="bg-gradient-to-r from-green-400 to-green-600 text-white font-bold py-2 px-4 rounded transform transition-all duration-300 hover:scale-110 hover:from-green-600 hover:to-green-800" onclick="handleAgeVerification(true)">Yes</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Ensure logger is correctly imported if using modules
+        // import logger from './logger.js'; // Uncomment if using modules
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = {
+                vendorSelect: document.getElementById('vendor-select'),
+                categorySelect: document.getElementById('category-select'),
+                vendorModal: document.getElementById('vendor-modal'),
+                closeVendorModalButton: document.getElementById('close-vendor-modal'),
+                modalVendorLink: document.getElementById('modal-vendor-link'),
+                warningMessage: document.getElementById('warning-message'),
+                warningOkButton: document.getElementById('warning-ok'),
+                ageModal: document.getElementById('age-modal'),
+                ageYesButton: document.getElementById('age-yes'),
+                ageNoButton: document.getElementById('age-no'),
+                dashboard: document.querySelector('main'),
+                vendorSearch: document.getElementById('vendor-search')
+            };
+
+            const vendorData = {
+                "Got The Loud": {
+                    "link": "https://gottheloud.com/product-category/concentrate/",
+                    "coupons": ["LOUD20", "SAVE25", "GTL30"], // Updated coupons
+                    "category": "concentrate",
+                    "paymentMethods": ["apple-pay"]
+                },
+                "Woodstock Hemp Company": {
+                    "link": "https://woodstockhempcompany.com/products/thca-liquid-diamond-live-resin-1-0g-cartridge",
+                    "coupons": ["WOODSTOCK25", "WHC20"], // Updated coupons
+                    "category": "cartridge",
+                    "paymentMethods": []
+                },
+                "The Hemp Barn": {
+                    "link": "https://www.thehempbarn.com/product/disposable-vape-1ml/",
+                    "coupons": ["HEMPBARN10", "THB15"], // Updated coupons
+                    "category": "vape"
+                },
+                "The Hemp Collect": {
+                    "link": "https://thehempcollect.com/products/thca-live-resin-cartridge-indica",
+                    "coupons": ["HEMPCOLLECT15", "THC25"], // Updated coupons
+                    "category": "cartridge"
+                },
+                "CannaHaus Farms": {
+                    "link": "https://cannahausfarms.com/collections/extracts/products/thca-live-hash-rosin?variant=43380202635422",
+                    "coupons": ["CANNAHAUS20", "CHF15"], // Updated coupons
+                    "category": "extracts"
+                },
+                "Well Fed Wolf": {
+                    "link": "https://www.wellfedwolf.com/s/order",
+                    "coupons": ["WELLFED10", "WFW5"],
+                    "category": "order"
+                },
+                "Dr. Ganja": {
+                    "link": "https://www.drganja.com",
+                    "coupons": ["DRGANJA5", "DG10"],
+                    "category": "general"
+                },
+                "CannaCrunchers CBD": {
+                    "link": "https://cannacruncherscbd.com/",
+                    "coupons": ["CRUNCHERS10", "CCC5"],
+                    "category": "general"
+                },
+                "Hemp Hop": {
+                    "link": "https://hemphop.co/collections/delta-8-thc-cbd-vape-cartridge",
+                    "coupons": ["HEMPHOP20", "HH10"],
+                    "category": "vape"
+                },
+                "Jamn Hemp Co.": {
+                    "link": "https://jamnhempco.com/product-category/thca/",
+                    "coupons": ["JAMNHEMP15", "JHC10"],
+                    "category": "thca"
+                },
+                "Arete Hemp": {
+                    "link": "https://aretehemp.com/product-category/vape/vape-thca/",
+                    "coupons": ["ARETEHEMP10", "AH5"],
+                    "category": "vape"
+                },
+                "Crysp": {
+                    "link": "https://crysp.co/cs/1714/",
+                    "coupons": ["CRYSP5", "CSP10"],
+                    "category": "general"
+                },
+                "Sticky Buds": {
+                    "link": "https://sticky-buds.com/product/mandarin-cookies-live-hash-rosin-5-cart/",
+                    "coupons": ["STICKYBUDS10", "SB5"],
+                    "category": "cart"
+                },
+                "Akira Botanicals": {
+                    "link": "https://www.akirabotanicals.com/",
+                    "coupons": ["AKIRA10", "AB5"],
+                    "category": "general"
+                },
+                "Savvy Source": {
+                    "link": "https://savvysource.info/",
+                    "coupons": ["SAVVY5", "SS10"],
+                    "category": "general"
+                },
+                "Black Owl Hemp Clinic": {
+                    "link": "https://blackowlhempclinic.com/collections",
+                    "coupons": ["BLACKOWL10", "BOHC5"],
+                    "category": "general"
+                },
+                "Official Push Product": {
+                    "link": "https://officialpushproduct.com/tanks/",
+                    "coupons": ["PUSHPRODUCT15", "OPP10"],
+                    "category": "tanks"
+                },
+                "Well Crafted Canna": {
+                    "link": "https://www.wellcraftedcanna.com/product-page/1g-thca-carts",
+                    "coupons": ["WELLCRAFTED10", "WCC5"],
+                    "category": "carts"
+                },
+                "Rush Hemp Farms": {
+                    "link": "https://rushhempfarms.com/",
+                    "coupons": ["RUSHHEMP5", "RHF10"],
+                    "category": "general"
+                },
+                "Piur Select": {
+                    "link": "https://www.piurselect.com/",
+                    "coupons": ["PIURSELECT10", "PS5"],
+                    "category": "general"
+                },
+                "Tribal": {
+                    "link": "https://www.tribal.ca/ark",
+                    "coupons": ["TRIBAL5", "TRB10"],
+                    "category": "general"
+                },
+                "Holistic Hope FL": {
+                    "link": "https://www.holistichopefl.com/online-store/Vapor-c40266049",
+                    "coupons": ["HOLISTIC10", "HH5"],
+                    "category": "vapor"
+                },
+                "Broccoli Hemp Company": {
+                    "link": "https://www.broccolihempcompany.com/",
+                    "coupons": ["BROCCOLI5", "BHC10"],
+                    "category": "general"
+                },
+                "Grinder Spoons": {
+                    "link": "https://www.grinderspoons.com",
+                    "coupons": ["GRINDER10", "GS5"],
+                    "category": "general"
+                },
+                "Fire Hemp Farms": {
+                    "link": "https://firehempfarms.com/vapes",
+                    "coupons": ["FIREHEMP15", "FHF10"],
+                    "category": "vapes"
+                },
+                "The Southern Hemp Collective": {
+                    "link": "https://www.thesouthernhempcollective.com/s/shop",
+                    "coupons": ["SOUTHERN10", "SHC5"],
+                    "category": "shop"
+                },
+                "Southern Harvest Hemp": {
+                    "link": "https://southernharvesthemp.com/",
+                    "coupons": ["HARVEST5", "SHH10"],
+                    "category": "general"
+                },
+                "Handcrafted Farmers": {
+                    "link": "https://handcraftedfarmers.com/",
+                    "coupons": ["HANDCRAFTED10", "HF5"],
+                    "category": "general"
+                },
+                "Peace Out Malaise CBD": {
+                    "link": "https://www.peaceoutmalaisecbd.com/",
+                    "coupons": ["PEACEOUT5", "POM10"],
+                    "category": "general"
+                },
+                "Galaxy Groves": {
+                    "link": "https://galaxygroves.com/",
+                    "coupons": ["GALAXY10", "GG5"],
+                    "category": "general"
+                },
+                "Roz From Frazier": {
+                    "link": "https://www.rozfromfrasier.com/s/shop",
+                    "coupons": ["ROZ5", "RFF10"],
+                    "category": "shop"
+                },
+                "Hello Mary": {
+                    "link": "https://hellomary.com/",
+                    "coupons": ["HELLOMARY10", "HM5"],
+                    "category": "general"
+                },
+                "Flow Gardens": {
+                    "link": "https://flowgardens.com/",
+                    "coupons": ["FLOW5", "FG10"],
+                    "category": "general"
+                },
+                "Lit Farms": {
+                    "link": "https://litfarms.com/",
+                    "coupons": ["LIT10", "LF5"],
+                    "category": "general"
+                },
+                "Wildflower Hemp Co.": {
+                    "link": "https://www.wildflowerhempco.com/",
+                    "coupons": ["WILDFLOWER5", "WHC10"],
+                    "category": "general"
+                },
+                "WNC CBD": {
+                    "link": "https://wnc-cbd.com/",
+                    "coupons": ["WNC10", "WC5"],
+                    "category": "general"
+                },
+                "Lucky Elk": {
+                    "link": "https://luckyelk.com/",
+                    "coupons": ["LUCKY5", "LE10"],
+                    "category": "general"
+                },
+                "CW Ventures": {
+                    "link": "https://www.cwventuresllctn.com/",
+                    "coupons": ["CW10", "CWV5"],
+                    "category": "general"
+                },
+                "Cowboy Cannabinist TN": {
+                    "link": "https://www.cowboycannabistn.net/s/shop",
+                    "coupons": ["COWBOY5", "CCT10"],
+                    "category": "shop"
+                },
+                "J Littys": {
+                    "link": "https://jlittys.com/",
+                    "coupons": ["JLITTYS10", "JL5"],
+                    "category": "general"
+                },
+                "Piur Select": {
+                    "link": "https://www.piurselect.com/select-drops.html#/",
+                    "coupons": ["PIURDROPS5", "PSD10"],
+                    "category": "drops"
+                },
+                "Deep Woods OK": {
+                    "link": "https://www.deepwoodsok.com/shop",
+                    "coupons": ["DEEPWOODS10", "DW5"],
+                    "category": "shop"
+                },
+                "Amish Grown": {
+                    "link": "https://www.amishgrown.com/s/shop",
+                    "coupons": ["AMISH5", "AG10"],
+                    "category": "shop"
+                },
+                "And Away Gardens": {
+                    "link": "https://www.andawaygardens.com/s/shop",
+                    "coupons": ["AWAY10", "AAG5"],
+                    "category": "shop"
+                },
+                "Tokesugar": {
+                    "link": "https://tokesugar.com/shop/vapes/",
+                    "coupons": ["TOKESUGAR5", "TS10"],
+                    "category": "vapes"
+                },
+                "Golden Hour Hemp": {
+                    "link": "https://goldenhourhemp.com/thca-cartridge/#tab-reviews",
+                    "coupons": ["GOLDEN10", "GH5"],
+                    "category": "cartridge"
+                },
+                "I Am Hemp": {
+                    "link": "https://www.iamhemp.co/products/carts",
+                    "coupons": ["IAMHEMP5", "IAH10"],
+                    "category": "carts"
+                },
+                "MyQwin": {
+                    "link": "https://www.myqwin.com/",
+                    "coupons": ["MYQWIN10", "MQ5"],
+                    "category": "general"
+                },
+                "Asheville Extracts": {
+                    "link": "https://ashevilleextracts.square.site/shop/concentrates/4",
+                    "coupons": ["ASHEVILLE5", "AE10"],
+                    "category": "concentrates"
+                },
+                "Veteran Grown Hemp": {
+                    "link": "https://www.veterangrownhemp.com/flower",
+                    "coupons": ["VETERAN10", "VGH5"],
+                    "category": "flower"
+                },
+                "Veteran Grown LLC": {
+                    "link": "https://www.veterangrownllc.com/online-store/Delta-8-Cartridge-p442370756",
+                    "coupons": ["VETERANLLC5", "VGL10"],
+                    "category": "cartridge"
+                },
+                "The Highway Hemp Co.": {
+                    "link": "https://www.thehighwayhemp.co/category/flower",
+                    "coupons": ["HIGHWAY10", "THH5"],
+                    "category": "flower"
+                },
+                "Yaga Farms": {
+                    "link": "https://www.yagafarms.com/products/420-exclusive?variant=48874482008361",
+                    "coupons": ["YAGA5", "YF10"],
+                    "category": "exclusive"
+                },
+                "Cosmic Hemp Gardens": {
+                    "link": "https://www.cosmichempgardens.com/",
+                    "coupons": ["COSMIC10", "CHG5"],
+                    "category": "general"
+                },
+                "Best Buds BFF": {
+                    "link": "https://bestbudsbff.com/hemp-shop/high-thca-hemp-flower/exotic-thca-hemp-flower/",
+                    "coupons": ["BESTBUDS5", "BB10"],
+                    "category": "flower"
+                },
+                "Buy Terp Boys": {
+                    "link": "https://buyterpboys.com/collections/thca-flower",
+                    "coupons": ["TERPBOYS10", "BTB5"],
+                    "category": "flower"
+                },
+                "THCA Flower Online": {
+                    "link": "https://www.thcaflower.online/",
+                    "coupons": ["THCAFLOWER5", "TFO10"],
+                    "category": "flower"
+                },
+                "Quantum Exotics": {
+                    "link": "https://www.quantumexotics.com/live-rosins",
+                    "coupons": ["QUANTUM10", "QE5"],
+                    "category": "rosins"
+                },
+                "Enlighten Hemp Co.": {
+                    "link": "https://enlightenhempco.com/",
+                    "coupons": ["ENLIGHTEN5", "EHC10"],
+                    "category": "general"
+                },
+                "Herbal Healers CBD": {
+                    "link": "https://herbalhealerscbd.com/product-category/hemp-flower/",
+                    "coupons": ["HERBAL10", "HHC5"],
+                    "category": "flower"
+                },
+                "Bearly Legal Hemp": {
+                    "link": "https://www.bearlylegalhemp.com/thca-flower-buds-nugs-potent/",
+                    "coupons": ["BEARLY5", "BLH10"],
+                    "category": "flower"
+                },
+                "CannanC": {
+                    "link": "https://cannanc.com/",
+                    "coupons": ["CANNAN10", "CC5"],
+                    "category": "general"
+                },
+                "Peace Out Malaise CBD": {
+                    "link": "https://www.peaceoutmalaisecbd.com/vapes-concentrates",
+                    "coupons": ["PEACEOUT5", "POM10"],
+                    "category": "vapes"
+                },
+                "Asheville Extracts": {
+                    "link": "https://ashevilleextracts.square.site/s/shop",
+                    "coupons": ["ASHEVILLE10", "AE5"],
+                    "category": "shop"
+                },
+                "Veteran Grown Hemp": {
+                    "link": "https://www.veterangrownhemp.com/flower",
+                    "coupons": ["VETERAN5", "VGH10"],
+                    "category": "flower"
+                },
+                "Veteran Grown LLC": {
+                    "link": "https://www.veterangrownllc.com/online-store/Delta-8-Cartridge-p442370756",
+                    "coupons": ["VETERANLLC10", "VGL5"],
+                    "category": "cartridge"
+                },
+                "Deep Woods OK": {
+                    "link": "https://www.deepwoodsok.com/",
+                    "coupons": ["DEEPWOODS5", "DW10"],
+                    "category": "general"
+                },
+                "Tokesugar": {
+                    "link": "https://tokesugar.com/product/modified-bananas-rosin-5ml/",
+                    "coupons": [],
+                    "category": "rosin"
+                },
+                "Hemp Hop": {
+                    "link": "https://hemphop.co/products/wedding-cake-high-thca-live-resin-vape-cartridge",
+                    "coupons": [],
+                    "category": "vape"
+                },
+                "The Delta Connect": {
+                    "link": "https://thedeltaconnect.com/products/trap-university-2-gram-thca-liquid-diamond-diaposable",
+                    "coupons": [],
+                    "category": "diamond"
+                },
+                "The Highway Hemp Co.": {
+                    "link": "https://www.thehighwayhemp.co/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Black Tie CBD": {
+                    "link": "https://blacktiecbd.net/?ref=pifxvgfi",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Fire Farms": {
+                    "link": "https://firefarms.co/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Buy THCA": {
+                    "link": "https://buythca.com/product/liquid-diamond-carts/",
+                    "coupons": [],
+                    "category": "carts"
+                },
+                "Magne Hemp Co.": {
+                    "link": "https://www.magnethempco.com/products",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Astria Farm": {
+                    "link": "https://astriafarm.com/thc-a/",
+                    "coupons": [],
+                    "category": "thc-a"
+                },
+                "The Somdexp": {
+                    "link": "https://thesomdexp.com/?coupon=Juice",
+                    "coupons": [],
+                    "category": "juice"
+                },
+                "AVL Dispensary": {
+                    "link": "https://avldispensary.com/product-category/thca/thca-live-rosin/",
+                    "coupons": [],
+                    "category": "rosin"
+                },
+                "Seed Attic": {
+                    "link": "https://www.seedattics.com/shop",
+                    "coupons": [],
+                    "category": "shop"
+                },
+                "Pine Essence CBD": {
+                    "link": "https://pineessencecbd.com/?post_type=product&paged=2",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Preston Herb Co.": {
+                    "link": "https://www.prestonherbco.com/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Simply Mary": {
+                    "link": "https://simplymary.co/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "Shop Hello Mary": {
+                    "link": "https://shophellomary.com/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "The Somdexp": {
+                    "link": "https://thesomdexp.com/product/thca-liquid-diamond-carts/",
+                    "coupons": [],
+                    "category": "carts"
+                },
+                "Wisconsin Hemp Flower": {
+                    "link": "https://wisconsinhempflower.com/shop",
+                    "coupons": [],
+                    "category": "flower"
+                },
+                "Magne Hemp Co.": {
+                    "link": "https://www.magnethempco.com/product-page/budget-thca-hash-rosin-cart-1g",
+                    "coupons": [],
+                    "category": "cart"
+                },
+                "Kaya Farms": {
+                    "link": "https://www.kayafarms.com/password",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "25 Hour Farms": {
+                    "link": "https://25hourfarms.com/collections/thca-concentrates",
+                    "coupons": [],
+                    "category": "concentrates"
+                },
+                "Black Tie CBD": {
+                    "link": "https://www.blacktiecbd.net/collections/smokables-hemp-flower",
+                    "coupons": [],
+                    "category": "flower"
+                },
+                "Rush Hemp Farms": {
+                    "link": "https://rushhempfarms.com/",
+                    "coupons": [],
+                    "category": "general"
+                },
+                "The Somdexp": {
+                    "link": "https://thesomdexp.com/product-category/canbin/compliant-thca/",
+                    "coupons": [],
+                    "category": "thca"
+                },
+                "Diesel Dispensary": {
+                    "link": "https://www.dieseldispensary.shop/category/all-products?page=5",
+                    "coupons": [],
+                    "category": "general"
+                }
+            };
+
+            function showAgeVerificationModal() {
+                // Check if the user has already verified their age
+                const ageVerified = localStorage.getItem('ageVerified');
+                if (ageVerified !== 'true') {
+                    elements.ageModal.style.display = 'flex';
+                } else {
+                    // If age is verified, show the dashboard and warning message
+                    elements.dashboard.style.display = 'block';
+                    elements.warningMessage.style.display = 'block';
+                    if (elements.warningOkButton) {
+                        elements.warningOkButton.addEventListener('click', () => {
+                            elements.warningMessage.style.display = 'none';
+                        });
+                    }
+                    populateVendorDropdown();
+                    populateCategoryDropdown();
+                }
+            }
+
+            function hideAgeVerificationModal() {
+                if (elements.ageModal) {
+                    elements.ageModal.style.display = 'none';
+                }
+            }
+
+            window.handleAgeVerification = function(isOfAge) {
+                hideAgeVerificationModal();
+                if (isOfAge) {
+                    console.log('User verified age successfully.'); // Use logger.info if logger is available
+                    localStorage.setItem('ageVerified', 'true'); // Save verification status locally
+                    elements.dashboard.style.display = 'block';
+                    elements.warningMessage.style.display = 'block';
+                    if (elements.warningOkButton) {
+                        elements.warningOkButton.addEventListener('click', () => {
+                            elements.warningMessage.style.display = 'none';
+                        });
+                    }
+                    populateVendorDropdown();
+                    populateCategoryDropdown();
+                } else {
+                    console.warn('User failed age verification.'); // Use logger.warn if logger is available
+                    window.location.href = 'https://www.google.com';
+                }
+            };
+
+            function populateVendorDropdown(vendors = Object.keys(vendorData)) {
+                const sortedVendors = vendors.sort();
+                elements.vendorSelect.innerHTML = '<option value="all">All Vendors</option>';
+                const fragment = document.createDocumentFragment();
+                sortedVendors.forEach(vendor => {
+                    const option = document.createElement('option');
+                    option.value = vendor;
+                    option.textContent = vendor;
+                    fragment.appendChild(option);
+                });
+                elements.vendorSelect.appendChild(fragment);
+            }
+
+            function populateCategoryDropdown() {
+                const categories = new Set(Object.values(vendorData).map(vendor => vendor.category));
+                elements.categorySelect.innerHTML = '<option value="all">All Categories</option>';
+                const fragment = document.createDocumentFragment();
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    fragment.appendChild(option);
+                });
+                elements.categorySelect.appendChild(fragment);
+            }
+
+            function updateVendorInfo(selectedVendor) {
+                const vendor = vendorData[selectedVendor];
+                if (vendor && vendor.link) {
+                    openVendorModal(vendor);
+                }
+            }
+
+            function fetchCouponsForVendor(vendorName) {
+                fetch(`/api/coupons?vendor=${vendorName}`)
+                    .then(response => response.json())
+                    .then(coupons => {
+                        displayCoupons(coupons);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching coupons:', error);
+                    });
+            }
+
+            function displayCoupons(coupons) {
+                const couponContainer = document.createElement('div');
+                couponContainer.classList.add('mt-4');
+                couponContainer.innerHTML = `<h4 class="text-lg font-bold mb-2">Available Coupons:</h4>`;
+                if (coupons && coupons.length > 0) {
+                    coupons.forEach(coupon => {
+                        const couponElement = document.createElement('p');
+                        couponElement.textContent = coupon;
+                        couponContainer.appendChild(couponElement);
+                    });
+                } else {
+                    couponContainer.innerHTML += `<p>No coupons available.</p>`;
+                }
+                elements.vendorModal.querySelector('.modal-content').appendChild(couponContainer);
+            }
+
+            function openVendorModal(vendor) {
+                elements.modalVendorLink.href = vendor.link;
+                elements.modalVendorLink.textContent = vendor.link;
+                elements.vendorModal.style.display = 'flex';
+
+                // Display coupon codes
+                const couponContainer = document.createElement('div');
+                couponContainer.classList.add('mt-4');
+                couponContainer.innerHTML = `<h4 class="text-lg font-bold mb-2">Available Coupons:</h4>`;
+                if (vendor.coupons && vendor.coupons.length > 0) {
+                    vendor.coupons.forEach(coupon => {
+                        const couponElement = document.createElement('p');
+                        couponElement.textContent = coupon;
+                        couponContainer.appendChild(couponElement);
+                    });
+                } else {
+                    couponContainer.innerHTML += `<p>No coupons available.</p>`;
+                }
+                elements.vendorModal.querySelector('.modal-content').appendChild(couponContainer);
+            }
+
+            function closeVendorModal() {
+                elements.vendorModal.style.display = 'none';
+                const couponContainer = elements.vendorModal.querySelector('.modal-content div.mt-4');
+                if (couponContainer) {
+                    couponContainer.remove();
+                }
+                // Repopulate the vendor dropdown with all vendors
+                populateVendorDropdown();
+            }
+
+            function initializeCarousel() {
+                const carousel = document.getElementById('carousel');
+                const featuredVendors = Object.keys(vendorData).slice(0, 10); // Get first 10 vendors
+
+                // Clear existing vendors
+                carousel.innerHTML = '';
+
+                // Add vendor names to the carousel
+                featuredVendors.forEach(vendor => {
+                    const vendorElement = document.createElement('div');
+                    vendorElement.classList.add('vendor-name');
+                    vendorElement.textContent = vendor;
+                    carousel.appendChild(vendorElement);
+                });
+
+                // Clone the first vendor and add it to the end for smooth looping
+                const firstVendorClone = carousel.firstElementChild.cloneNode(true);
+                carousel.appendChild(firstVendorClone);
+
+                let currentIndex = 0;
+                const totalVendors = featuredVendors.length;
+
+                function rotateCarousel() {
+                    currentIndex++;
+                    carousel.style.transition = 'transform 0.5s ease-in-out';
+                    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                    if (currentIndex === totalVendors) {
+                        setTimeout(() => {
+                            carousel.style.transition = 'none';
+                            carousel.style.transform = 'translateX(0)';
+                            currentIndex = 0;
+                        }, 500);
+                    }
+                }
+
+                setInterval(rotateCarousel, 3000); // Rotate every 3 seconds
+            }
+
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const featuredVendorName = document.getElementById('featured-vendor-name');
+            const featuredVendorLink = document.getElementById('featured-vendor-link');
+
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            }
+
+            function loadDarkModePreference() {
+                const darkModePreference = localStorage.getItem('darkMode');
+                if (darkModePreference === 'enabled') {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+
+            function searchVendors(query) {
+                const lowercaseQuery = query.toLowerCase();
+                const filteredVendors = Object.keys(vendorData).filter(vendor =>
+                    vendor.toLowerCase().includes(lowercaseQuery)
+                );
+                populateVendorDropdown(filteredVendors);
+            }
+
+            function filterProducts() {
+                const selectedCategory = elements.categorySelect.value;
+                const selectedVendor = elements.vendorSelect.value;
+                const filteredProducts = Object.keys(vendorData).filter(vendor => {
+                    const vendorInfo = vendorData[vendor];
+                    const matchesCategory = selectedCategory === 'all' ||
+                        (selectedCategory === 'apple-pay' && vendorInfo.paymentMethods.includes('apple-pay')) ||
+                        vendorInfo.category === selectedCategory;
+                    const matchesVendor = selectedVendor === 'all' || vendor === selectedVendor;
+                    return matchesCategory && matchesVendor;
+                });
+                populateVendorDropdown(filteredProducts);
+            }
+
+            function setFeaturedVendor() {
+                const vendors = Object.keys(vendorData);
+                const randomVendor = vendors[Math.floor(Math.random() * vendors.length)];
+                const featuredVendorSection = document.getElementById('featured-vendor');
+
+                // Add a fade-out effect
+                featuredVendorSection.style.opacity = '0';
+                featuredVendorSection.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    featuredVendorName.textContent = randomVendor;
+                    featuredVendorLink.href = vendorData[randomVendor].link;
+
+                    // Add a fade-in effect
+                    featuredVendorSection.style.opacity = '1';
+                    featuredVendorSection.style.transform = 'translateY(0)';
+                }, 300);
+            }
+
+            // Call setFeaturedVendor every 24 hours (86400000 milliseconds)
+            setInterval(setFeaturedVendor, 86400000);
+
+            function sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            function validateInput(input, pattern) {
+                const regex = new RegExp(pattern);
+                return regex.test(input);
+            }
+
+            // Event Listeners
+            elements.ageYesButton.addEventListener('click', () => handleAgeVerification(true));
+            elements.ageNoButton.addEventListener('click', () => handleAgeVerification(false));
+            elements.vendorSelect.addEventListener('change', (e) => {
+                if (e.target.value !== 'all') {
+                    updateVendorInfo(e.target.value);
+                }
+                filterProducts();
+            });
+            elements.categorySelect.addEventListener('change', filterProducts);
+            elements.closeVendorModalButton.addEventListener('click', closeVendorModal);
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            elements.vendorSearch.addEventListener('input', (e) => {
+                const sanitizedValue = sanitizeInput(e.target.value);
+                if (validateInput(sanitizedValue, '^[A-Za-z0-9\\s]+$')) {
+                    searchVendors(sanitizedValue);
+                } else {
+                    console.warn('Invalid input detected');
+                }
+            });
+
+            // Initialize
+            elements.dashboard.style.display = 'none';
+            elements.vendorModal.style.display = 'none';
+            showAgeVerificationModal();
+            initializeCarousel();
+            setFeaturedVendor();
+
+            function filterVendorsByApplePay() {
+                const applePayVendors = Object.keys(vendorData).filter(vendor =>
+                    vendorData[vendor].paymentMethods.includes('apple-pay')
+                );
+                console.log('Vendors that accept Apple Pay:', applePayVendors);
+                return applePayVendors;
+            }
+
+            // Call the function to see the vendors that accept Apple Pay
+            const applePayVendors = filterVendorsByApplePay();
+            // You can use applePayVendors to update the UI or for other purposes
+        });
+    </script>
+</body>
+
+</html>

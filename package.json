@@ -1,0 +1,39 @@
+{
+    "name": "thcarosin",
+    "version": "1.1.0",
+    "main": "server.js",
+    "scripts": {
+        "build:css": "postcss public/css/styles.css -o public/css/tailwind.css",
+        "start": "node server.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint ."
+    },
+    "keywords": [
+        "cannabis",
+        "vendor",
+        "directory"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "autoprefixer": "^10.4.20",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.21.0",
+        "express-rate-limit": "^7.4.0",
+        "helmet": "^7.1.0",
+        "hpp": "^0.2.3",
+        "postcss": "^8.4.47",
+        "rippleui": "^1.12.1",
+        "xss-clean": "^0.1.4"
+    },
+    "devDependencies": {
+        "@tailwindcss/typography": "^0.5.15",
+        "daisyui": "^4.12.10",
+        "eslint": "^8.29.0",
+        "flowbite-typography": "^1.0.3",
+        "postcss-cli": "^9.1.0",
+        "tailwindcss": "^3.4.12"
+    },
+    "description": "A directory for cannabis vendors"
+}
