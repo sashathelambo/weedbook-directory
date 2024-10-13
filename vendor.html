@@ -207,517 +207,52 @@
             const vendorSortBottom = document.getElementById('vendor-sort-bottom');
             const resetFiltersBottom = document.getElementById('reset-filters-bottom');
 
-            // Cache for vendor data
-            const vendorCache = {};
+            let vendorData = [];
 
-            class Vendor {
-                constructor(name, url, category, coupons) {
-                    this.name = name;
-                    this.url = url;
-                    this.category = category;
-                    this.coupons = coupons;
-                }
-
-                display() {
-                    const vendorElement = document.createElement('div');
-                    vendorElement.classList.add('vendor');
-                    vendorElement.innerHTML = `
-                        <div class="flex items-center justify-center">
-                            <a href="${this.url}" target="_blank" class="text-black-500 hover:underline">${this.name}</a>
-                        </div>
-                        <div class="coupons">
-                            ${this.coupons.length > 0 ? 'Coupons: ' + this.coupons.join(', ') : 'No coupons available'}
-                        </div>
-                    `;
-                    return vendorElement;
-                }
-            }
-
-            const vendorData = [{
-                "name": "Got The Loud",
-                "link": "https://gottheloud.com/product-category/concentrate/",
-                "coupons": ["LOUD20", "SAVE25", "GTL30"],
-                "category": "concentrate",
-                "paymentMethods": ["apple-pay"]
-            }, {
-                "name": "Woodstock Hemp Company",
-                "link": "https://woodstockhempcompany.com/products/thca-liquid-diamond-live-resin-1-0g-cartridge",
-                "coupons": ["WOODSTOCK25", "WHC20"],
-                "category": "cartridge",
-                "paymentMethods": []
-            }, {
-                "name": "The Hemp Barn",
-                "link": "https://www.thehempbarn.com/product/disposable-vape-1ml/",
-                "coupons": ["HEMPBARN10", "THB15"],
-                "category": "vape"
-            }, {
-                "name": "The Hemp Collect",
-                "link": "https://thehempcollect.com/products/thca-live-resin-cartridge-indica",
-                "coupons": ["HEMPCOLLECT15", "THC25"],
-                "category": "cartridge"
-            }, {
-                "name": "CannaHaus Farms",
-                "link": "https://cannahausfarms.com/collections/extracts/products/thca-live-hash-rosin?variant=43380202635422",
-                "coupons": ["CANNAHAUS20", "CHF15"],
-                "category": "extracts"
-            }, {
-                "name": "Well Fed Wolf",
-                "link": "https://www.wellfedwolf.com/s/order",
-                "coupons": ["WELLFED10", "WFW5"],
-                "category": "order"
-            }, {
-                "name": "Dr. Ganja",
-                "link": "https://www.drganja.com",
-                "coupons": ["DRGANJA5", "DG10"],
-                "category": "general"
-            }, {
-                "name": "CannaCrunchers CBD",
-                "link": "https://cannacruncherscbd.com/",
-                "coupons": ["CRUNCHERS10", "CCC5"],
-                "category": "general"
-            }, {
-                "name": "Hemp Hop",
-                "link": "https://hemphop.co/collections/delta-8-thc-cbd-vape-cartridge",
-                "coupons": ["HEMPHOP20", "HH10"],
-                "category": "vape"
-            }, {
-                "name": "Jamn Hemp Co.",
-                "link": "https://jamnhempco.com/product-category/thca/",
-                "coupons": ["JAMNHEMP15", "JHC10"],
-                "category": "thca"
-            }, {
-                "name": "Arete Hemp",
-                "link": "https://aretehemp.com/product-category/vape/vape-thca/",
-                "coupons": ["ARETEHEMP10", "AH5"],
-                "category": "vape"
-            }, {
-                "name": "Crysp",
-                "link": "https://crysp.co/cs/1714/",
-                "coupons": ["CRYSP5", "CSP10"],
-                "category": "general"
-            }, {
-                "name": "Sticky Buds",
-                "link": "https://sticky-buds.com/product/mandarin-cookies-live-hash-rosin-5-cart/",
-                "coupons": ["STICKYBUDS10", "SB5"],
-                "category": "cart"
-            }, {
-                "name": "Akira Botanicals",
-                "link": "https://www.akirabotanicals.com/",
-                "coupons": ["AKIRA10", "AB5"],
-                "category": "general"
-            }, {
-                "name": "Savvy Source",
-                "link": "https://savvysource.info/",
-                "coupons": ["SAVVY5", "SS10"],
-                "category": "general"
-            }, {
-                "name": "Black Owl Hemp Clinic",
-                "link": "https://blackowlhempclinic.com/collections",
-                "coupons": ["BLACKOWL10", "BOHC5"],
-                "category": "general"
-            }, {
-                "name": "Official Push Product",
-                "link": "https://officialpushproduct.com/tanks/",
-                "coupons": ["PUSHPRODUCT15", "OPP10"],
-                "category": "tanks"
-            }, {
-                "name": "Well Crafted Canna",
-                "link": "https://www.wellcraftedcanna.com/product-page/1g-thca-carts",
-                "coupons": ["WELLCRAFTED10", "WCC5"],
-                "category": "carts"
-            }, {
-                "name": "Rush Hemp Farms",
-                "link": "https://rushhempfarms.com/",
-                "coupons": ["RUSHHEMP5", "RHF10"],
-                "category": "general"
-            }, {
-                "name": "Piur Select",
-                "link": "https://www.piurselect.com/",
-                "coupons": ["PIURSELECT10", "PS5"],
-                "category": "general"
-            }, {
-                "name": "Tribal",
-                "link": "https://www.tribal.ca/ark",
-                "coupons": ["TRIBAL5", "TRB10"],
-                "category": "general"
-            }, {
-                "name": "Holistic Hope FL",
-                "link": "https://www.holistichopefl.com/online-store/Vapor-c40266049",
-                "coupons": ["HOLISTIC10", "HH5"],
-                "category": "vapor"
-            }, {
-                "name": "Broccoli Hemp Company",
-                "link": "https://www.broccolihempcompany.com/",
-                "coupons": ["BROCCOLI5", "BHC10"],
-                "category": "general"
-            }, {
-                "name": "Grinder Spoons",
-                "link": "https://www.grinderspoons.com",
-                "coupons": ["GRINDER10", "GS5"],
-                "category": "general"
-            }, {
-                "name": "Fire Hemp Farms",
-                "link": "https://firehempfarms.com/vapes",
-                "coupons": ["FIREHEMP15", "FHF10"],
-                "category": "vapes"
-            }, {
-                "name": "The Southern Hemp Collective",
-                "link": "https://www.thesouthernhempcollective.com/s/shop",
-                "coupons": ["SOUTHERN10", "SHC5"],
-                "category": "shop"
-            }, {
-                "name": "Southern Harvest Hemp",
-                "link": "https://southernharvesthemp.com/",
-                "coupons": ["HARVEST5", "SHH10"],
-                "category": "general"
-            }, {
-                "name": "Handcrafted Farmers",
-                "link": "https://handcraftedfarmers.com/",
-                "coupons": ["HANDCRAFTED10", "HF5"],
-                "category": "general"
-            }, {
-                "name": "Peace Out Malaise CBD",
-                "link": "https://www.peaceoutmalaisecbd.com/",
-                "coupons": ["PEACEOUT5", "POM10"],
-                "category": "general"
-            }, {
-                "name": "Galaxy Groves",
-                "link": "https://galaxygroves.com/",
-                "coupons": ["GALAXY10", "GG5"],
-                "category": "general"
-            }, {
-                "name": "Roz From Frazier",
-                "link": "https://www.rozfromfrasier.com/s/shop",
-                "coupons": ["ROZ5", "RFF10"],
-                "category": "shop"
-            }, {
-                "name": "Hello Mary",
-                "link": "https://hellomary.com/",
-                "coupons": ["HELLOMARY10", "HM5"],
-                "category": "general"
-            }, {
-                "name": "Flow Gardens",
-                "link": "https://flowgardens.com/",
-                "coupons": ["FLOW5", "FG10"],
-                "category": "general"
-            }, {
-                "name": "Lit Farms",
-                "link": "https://litfarms.com/",
-                "coupons": ["LIT10", "LF5"],
-                "category": "general"
-            }, {
-                "name": "Wildflower Hemp Co.",
-                "link": "https://www.wildflowerhempco.com/",
-                "coupons": ["WILDFLOWER5", "WHC10"],
-                "category": "general"
-            }, {
-                "name": "WNC CBD",
-                "link": "https://wnc-cbd.com/",
-                "coupons": ["WNC10", "WC5"],
-                "category": "general"
-            }, {
-                "name": "Lucky Elk",
-                "link": "https://luckyelk.com/",
-                "coupons": ["LUCKY5", "LE10"],
-                "category": "general"
-            }, {
-                "name": "CW Ventures",
-                "link": "https://www.cwventuresllctn.com/",
-                "coupons": ["CW10", "CWV5"],
-                "category": "general"
-            }, {
-                "name": "Cowboy Cannabinist TN",
-                "link": "https://www.cowboycannabistn.net/s/shop",
-                "coupons": ["COWBOY5", "CCT10"],
-                "category": "shop"
-            }, {
-                "name": "J Littys",
-                "link": "https://jlittys.com/",
-                "coupons": ["JLITTYS10", "JL5"],
-                "category": "general"
-            }, {
-                "name": "Piur Select",
-                "link": "https://www.piurselect.com/select-drops.html#/",
-                "coupons": ["PIURDROPS5", "PSD10"],
-                "category": "drops"
-            }, {
-                "name": "Deep Woods OK",
-                "link": "https://www.deepwoodsok.com/shop",
-                "coupons": ["DEEPWOODS10", "DW5"],
-                "category": "shop"
-            }, {
-                "name": "Amish Grown",
-                "link": "https://www.amishgrown.com/s/shop",
-                "coupons": ["AMISH5", "AG10"],
-                "category": "shop"
-            }, {
-                "name": "And Away Gardens",
-                "link": "https://www.andawaygardens.com/s/shop",
-                "coupons": ["AWAY10", "AAG5"],
-                "category": "shop"
-            }, {
-                "name": "Tokesugar",
-                "link": "https://tokesugar.com/shop/vapes/",
-                "coupons": ["TOKESUGAR5", "TS10"],
-                "category": "vapes"
-            }, {
-                "name": "Golden Hour Hemp",
-                "link": "https://goldenhourhemp.com/thca-cartridge/#tab-reviews",
-                "coupons": ["GOLDEN10", "GH5"],
-                "category": "cartridge"
-            }, {
-                "name": "I Am Hemp",
-                "link": "https://www.iamhemp.co/products/carts",
-                "coupons": ["IAMHEMP5", "IAH10"],
-                "category": "carts"
-            }, {
-                "name": "MyQwin",
-                "link": "https://www.myqwin.com/",
-                "coupons": ["MYQWIN10", "MQ5"],
-                "category": "general"
-            }, {
-                "name": "Asheville Extracts",
-                "link": "https://ashevilleextracts.square.site/shop/concentrates/4",
-                "coupons": ["ASHEVILLE5", "AE10"],
-                "category": "concentrates"
-            }, {
-                "name": "Veteran Grown Hemp",
-                "link": "https://www.veterangrownhemp.com/flower",
-                "coupons": ["VETERAN10", "VGH5"],
-                "category": "flower"
-            }, {
-                "name": "Veteran Grown LLC",
-                "link": "https://www.veterangrownllc.com/online-store/Delta-8-Cartridge-p442370756",
-                "coupons": ["VETERANLLC5", "VGL10"],
-                "category": "cartridge"
-            }, {
-                "name": "The Highway Hemp Co.",
-                "link": "https://www.thehighwayhemp.co/category/flower",
-                "coupons": ["HIGHWAY10", "THH5"],
-                "category": "flower"
-            }, {
-                "name": "Yaga Farms",
-                "link": "https://www.yagafarms.com/products/420-exclusive?variant=48874482008361",
-                "coupons": ["YAGA5", "YF10"],
-                "category": "exclusive"
-            }, {
-                "name": "Cosmic Hemp Gardens",
-                "link": "https://www.cosmichempgardens.com/",
-                "coupons": ["COSMIC10", "CHG5"],
-                "category": "general"
-            }, {
-                "name": "Best Buds BFF",
-                "link": "https://bestbudsbff.com/hemp-shop/high-thca-hemp-flower/exotic-thca-hemp-flower/",
-                "coupons": ["BESTBUDS5", "BB10"],
-                "category": "flower"
-            }, {
-                "name": "Buy Terp Boys",
-                "link": "https://buyterpboys.com/collections/thca-flower",
-                "coupons": ["TERPBOYS10", "BTB5"],
-                "category": "flower"
-            }, {
-                "name": "THCA Flower Online",
-                "link": "https://www.thcaflower.online/",
-                "coupons": ["THCAFLOWER5", "TFO10"],
-                "category": "flower"
-            }, {
-                "name": "Quantum Exotics",
-                "link": "https://www.quantumexotics.com/live-rosins",
-                "coupons": ["QUANTUM10", "QE5"],
-                "category": "rosins"
-            }, {
-                "name": "Enlighten Hemp Co.",
-                "link": "https://enlightenhempco.com/",
-                "coupons": ["ENLIGHTEN5", "EHC10"],
-                "category": "general"
-            }, {
-                "name": "Herbal Healers CBD",
-                "link": "https://herbalhealerscbd.com/product-category/hemp-flower/",
-                "coupons": ["HERBAL10", "HHC5"],
-                "category": "flower"
-            }, {
-                "name": "Bearly Legal Hemp",
-                "link": "https://www.bearlylegalhemp.com/thca-flower-buds-nugs-potent/",
-                "coupons": ["BEARLY5", "BLH10"],
-                "category": "flower"
-            }, {
-                "name": "CannanC",
-                "link": "https://cannanc.com/",
-                "coupons": ["CANNAN10", "CC5"],
-                "category": "general"
-            }, {
-                "name": "Peace Out Malaise CBD",
-                "link": "https://www.peaceoutmalaisecbd.com/vapes-concentrates",
-                "coupons": ["PEACEOUT5", "POM10"],
-                "category": "vapes"
-            }, {
-                "name": "Asheville Extracts",
-                "link": "https://ashevilleextracts.square.site/s/shop",
-                "coupons": ["ASHEVILLE10", "AE5"],
-                "category": "shop"
-            }, {
-                "name": "Veteran Grown Hemp",
-                "link": "https://www.veterangrownhemp.com/flower",
-                "coupons": ["VETERAN5", "VGH10"],
-                "category": "flower"
-            }, {
-                "name": "Veteran Grown LLC",
-                "link": "https://www.veterangrownllc.com/online-store/Delta-8-Cartridge-p442370756",
-                "coupons": ["VETERANLLC10", "VGL5"],
-                "category": "cartridge"
-            }, {
-                "name": "Deep Woods OK",
-                "link": "https://www.deepwoodsok.com/",
-                "coupons": ["DEEPWOODS5", "DW10"],
-                "category": "general"
-            }, {
-                "name": "Tokesugar",
-                "link": "https://tokesugar.com/product/modified-bananas-rosin-5ml/",
-                "coupons": [],
-                "category": "rosin"
-            }, {
-                "name": "Hemp Hop",
-                "link": "https://hemphop.co/products/wedding-cake-high-thca-live-resin-vape-cartridge",
-                "coupons": [],
-                "category": "vape"
-            }, {
-                "name": "The Delta Connect",
-                "link": "https://thedeltaconnect.com/products/trap-university-2-gram-thca-liquid-diamond-diaposable",
-                "coupons": [],
-                "category": "diamond"
-            }, {
-                "name": "The Highway Hemp Co.",
-                "link": "https://www.thehighwayhemp.co/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Black Tie CBD",
-                "link": "https://blacktiecbd.net/?ref=pifxvgfi",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Fire Farms",
-                "link": "https://firefarms.co/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Buy THCA",
-                "link": "https://buythca.com/product/liquid-diamond-carts/",
-                "coupons": [],
-                "category": "carts"
-            }, {
-                "name": "Magne Hemp Co.",
-                "link": "https://www.magnethempco.com/products",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Astria Farm",
-                "link": "https://astriafarm.com/thc-a/",
-                "coupons": [],
-                "category": "thc-a"
-            }, {
-                "name": "The Somdexp",
-                "link": "https://thesomdexp.com/?coupon=Juice",
-                "coupons": [],
-                "category": "juice"
-            }, {
-                "name": "AVL Dispensary",
-                "link": "https://avldispensary.com/product-category/thca/thca-live-rosin/",
-                "coupons": [],
-                "category": "rosin"
-            }, {
-                "name": "Seed Attic",
-                "link": "https://www.seedattics.com/shop",
-                "coupons": [],
-                "category": "shop"
-            }, {
-                "name": "Pine Essence CBD",
-                "link": "https://pineessencecbd.com/?post_type=product&paged=2",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Preston Herb Co.",
-                "link": "https://www.prestonherbco.com/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Simply Mary",
-                "link": "https://simplymary.co/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "Shop Hello Mary",
-                "link": "https://shophellomary.com/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "The Somdexp",
-                "link": "https://thesomdexp.com/product/thca-liquid-diamond-carts/",
-                "coupons": [],
-                "category": "carts"
-            }, {
-                "name": "Wisconsin Hemp Flower",
-                "link": "https://wisconsinhempflower.com/shop",
-                "coupons": [],
-                "category": "flower"
-            }, {
-                "name": "Magne Hemp Co.",
-                "link": "https://www.magnethempco.com/product-page/budget-thca-hash-rosin-cart-1g",
-                "coupons": [],
-                "category": "cart"
-            }, {
-                "name": "Kaya Farms",
-                "link": "https://www.kayafarms.com/password",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "25 Hour Farms",
-                "link": "https://25hourfarms.com/collections/thca-concentrates",
-                "coupons": [],
-                "category": "concentrates"
-            }, {
-                "name": "Black Tie CBD",
-                "link": "https://www.blacktiecbd.net/collections/smokables-hemp-flower",
-                "coupons": [],
-                "category": "flower"
-            }, {
-                "name": "Rush Hemp Farms",
-                "link": "https://rushhempfarms.com/",
-                "coupons": [],
-                "category": "general"
-            }, {
-                "name": "The Somdexp",
-                "link": "https://thesomdexp.com/product-category/canbin/compliant-thca/",
-                "coupons": [],
-                "category": "thca"
-            }, {
-                "name": "Diesel Dispensary",
-                "link": "https://www.dieseldispensary.shop/category/all-products?page=5",
-                "coupons": [],
-                "category": "general"
-            }];
-
-            // Create Vendor objects and populate cache
-            const vendors = vendorData.map(vendor => {
-                const vendorObj = new Vendor(vendor.name, vendor.link, vendor.category, vendor.coupons);
-                if (!vendorCache[vendor.category]) {
-                    vendorCache[vendor.category] = [];
-                }
-                vendorCache[vendor.category].push(vendorObj);
-                return vendorObj;
-            });
+            fetch('VendorData.csv')
+                .then(response => response.text())
+                .then(data => {
+                    // Parse CSV data
+                    const rows = data.split('\n');
+                    rows.forEach((row, index) => {
+                        if (index === 0) return; // Skip header row
+                        const columns = row.split(',');
+                        if (columns.length > 1) {
+                            const vendor = {
+                                name: columns[0],
+                                link: columns[1],
+                                coupons: columns[2] ? columns[2].split(', ') : [],
+                                category: columns[3],
+                                paymentMethods: columns[4] ? columns[4].split(', ') : []
+                            };
+                            vendorData.push(vendor);
+                        }
+                    });
+                    // Sort vendors alphabetically by name
+                    vendorData.sort((a, b) => a.name.localeCompare(b.name));
+                    // Now you can use vendorData as needed
+                    displayVendors(vendorData);
+                })
+                .catch(error => console.error('Error fetching vendor data:', error));
 
             function displayVendors(vendors) {
                 const fragment = document.createDocumentFragment();
                 vendors.forEach(vendor => {
-                    fragment.appendChild(vendor.display());
+                    const vendorElement = document.createElement('div');
+                    vendorElement.classList.add('vendor');
+                    vendorElement.innerHTML = `
+                        <div class="flex items-center justify-center">
+                            <a href="${vendor.link}" target="_blank" class="text-black-500 hover:underline">${vendor.name}</a>
+                        </div>
+                        <div class="coupons">
+                            ${vendor.coupons.length > 0 ? 'Coupons: ' + vendor.coupons.join(', ') : 'No coupons available'}
+                        </div>
+                    `;
+                    fragment.appendChild(vendorElement);
                 });
                 vendorsContainer.innerHTML = '';
                 vendorsContainer.appendChild(fragment);
             }
-
-            // Initial display of all vendors
-            displayVendors(vendors);
 
             // Debounce function to limit the rate of function calls
             function debounce(func, wait) {
@@ -730,11 +265,11 @@
 
             // Filter and sort vendors based on user input
             function filterAndSortVendors() {
-                const searchTerm = vendorSearch.value.toLowerCase();
-                const selectedCategory = vendorCategory.value;
-                const sortBy = vendorSort.value;
+                const searchTerm = vendorSearchTop.value.toLowerCase();
+                const selectedCategory = vendorCategoryTop.value;
+                const sortBy = vendorSortTop.value;
 
-                let filteredVendors = vendors.filter(vendor => vendor.name.toLowerCase().includes(searchTerm));
+                let filteredVendors = vendorData.filter(vendor => vendor.name.toLowerCase().includes(searchTerm));
 
                 if (selectedCategory !== 'all') {
                     filteredVendors = filteredVendors.filter(vendor => vendor.category === selectedCategory);
@@ -752,15 +287,15 @@
             }
 
             // Event listeners
-            vendorSearch.addEventListener('input', debounce(filterAndSortVendors, 300));
-            vendorCategory.addEventListener('change', filterAndSortVendors);
-            vendorSort.addEventListener('change', filterAndSortVendors);
+            vendorSearchTop.addEventListener('input', debounce(filterAndSortVendors, 300));
+            vendorCategoryTop.addEventListener('change', filterAndSortVendors);
+            vendorSortTop.addEventListener('change', filterAndSortVendors);
 
-            resetFilters.addEventListener('click', function() {
-                vendorSearch.value = '';
-                vendorCategory.value = 'all';
-                vendorSort.value = 'name';
-                displayVendors(vendors);
+            resetFiltersTop.addEventListener('click', function() {
+                vendorSearchTop.value = '';
+                vendorCategoryTop.value = 'all';
+                vendorSortTop.value = 'name';
+                displayVendors(vendorData);
             });
 
             // Dark mode toggle
